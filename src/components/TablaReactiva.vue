@@ -1,6 +1,9 @@
 <template>
   <div>
     <h2>Tabla</h2>
+    <div class="alert alert-success" v-if="successMessage">
+      {{ successMessage }}
+    </div>
     <div class="table-responsive">
       <table class="table table-striped">
         <thead>
@@ -13,13 +16,18 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in data" :key="index">
+          <tr v-for="(item, index) in formData" :key="index">
             <td>{{ item.name }}</td>
             <td>{{ item.email }}</td>
             <td>{{ item.age }}</td>
             <td>{{ item.phone }}</td>
             <td>
-              <button @click="removeItem(index)" class="btn btn-danger">Eliminar</button>
+              <button
+                @click="deleteItem(item.id, index)"
+                class="btn btn-danger"
+              >
+                Eliminar
+              </button>
             </td>
           </tr>
         </tbody>
@@ -29,17 +37,26 @@
 </template>
 
 <script>
+import { mapState, mapActions } from "vuex";
+
 export default {
-  props: {
-    data: {
-      type: Array,
-      required: true
-    }
+  computed: {
+    ...mapState(["formData", "successMessage"]),
+  },
+  created() {
+    this.fetchFormData();
   },
   methods: {
-    removeItem(index) {
-      this.$emit('remove', index);
-    }
-  }
+    ...mapActions(["fetchFormData", "deleteFormData"]),
+    deleteItem(id, index) {
+      this.deleteFormData({ id, index })
+        .then(() => {
+          alert("Usuario eliminado exitosamente");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+  },
 };
 </script>
